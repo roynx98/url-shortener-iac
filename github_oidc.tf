@@ -48,7 +48,8 @@ data "aws_iam_policy_document" "github_pr_read" {
       "dynamodb:DescribeTable",
       "dynamodb:DescribeContinuousBackups",
       "dynamodb:ListTables",
-      "dynamodb:DescribeTimeToLive"
+      "dynamodb:DescribeTimeToLive",
+      "dynamodb:ListTagsOfResource"
     ]
     resources = [
       aws_dynamodb_table.url_shortener.arn,
@@ -60,7 +61,9 @@ data "aws_iam_policy_document" "github_pr_read" {
     effect = "Allow"
     actions = [
       "iam:ListOpenIDConnectProviders",
-      "iam:GetOpenIDConnectProvider"
+      "iam:GetOpenIDConnectProvider",
+      "iam:GetRole",
+      "iam:ListRolePolicies"
     ]
     resources = ["*"]
   }
