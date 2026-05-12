@@ -46,11 +46,23 @@ data "aws_iam_policy_document" "github_pr_read" {
     effect = "Allow"
     actions = [
       "dynamodb:DescribeTable",
+      "dynamodb:DescribeContinuousBackups",
       "dynamodb:ListTables",
+      "dynamodb:DescribeTimeToLive"
     ]
     resources = [
       aws_dynamodb_table.url_shortener.arn,
     ]
+  }
+
+  statement {
+    sid    = "IAMRead"
+    effect = "Allow"
+    actions = [
+      "iam:ListOpenIDConnectProviders",
+      "iam:GetOpenIDConnectProvider"
+    ]
+    resources = ["*"]
   }
 }
 
