@@ -63,7 +63,9 @@ data "aws_iam_policy_document" "github_pr_read" {
       "iam:ListOpenIDConnectProviders",
       "iam:GetOpenIDConnectProvider",
       "iam:GetRole",
-      "iam:ListRolePolicies"
+      "iam:ListRolePolicies",
+      "iam:ListAttachedRolePolicies",
+      "iam:GetRolePolicy"
     ]
     resources = ["*"]
   }
