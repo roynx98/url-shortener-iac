@@ -18,6 +18,10 @@ provider "aws" {
   region = var.region
 }
 
+resource "aws_s3_bucket" "lambda_zips" {
+  bucket = "ur-shortener-lambda-zips"
+}
+
 resource "aws_dynamodb_table" "url_shortener" {
   name         = "url-shortener"
   billing_mode = "PAY_PER_REQUEST"
