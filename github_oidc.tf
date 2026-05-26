@@ -168,6 +168,34 @@ data "aws_iam_policy_document" "github_pr_read" {
   }
 
   statement {
+    sid    = "S3LambdaZipsRead"
+    effect = "Allow"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:GetBucketVersioning",
+      "s3:GetBucketTagging",
+      "s3:GetBucketPolicy",
+      "s3:GetBucketPolicyStatus",
+      "s3:GetBucketPublicAccessBlock",
+      "s3:GetBucketLogging",
+      "s3:GetBucketRequestPayment",
+      "s3:GetBucketWebsite",
+      "s3:GetBucketCORS",
+      "s3:GetBucketObjectLockConfiguration",
+      "s3:GetEncryptionConfiguration",
+      "s3:GetLifecycleConfiguration",
+      "s3:GetReplicationConfiguration",
+      "s3:GetAccelerateConfiguration",
+      "s3:GetBucketAcl",
+    ]
+    resources = [
+      aws_s3_bucket.lambda_zips.arn,
+      "${aws_s3_bucket.lambda_zips.arn}/*",
+    ]
+  }
+
+  statement {
     sid    = "DynamoDBRead"
     effect = "Allow"
     actions = [
