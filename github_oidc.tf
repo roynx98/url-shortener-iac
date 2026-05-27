@@ -91,18 +91,10 @@ data "aws_iam_policy_document" "github_main_write" {
   }
 
   statement {
-    sid    = "IAMWrite"
+    sid    = "IAMRead"
     effect = "Allow"
     actions = [
-      "iam:CreateRole",
-      "iam:DeleteRole",
       "iam:GetRole",
-      "iam:UpdateRole",
-      "iam:PassRole",
-      "iam:AttachRolePolicy",
-      "iam:DetachRolePolicy",
-      "iam:PutRolePolicy",
-      "iam:DeleteRolePolicy",
       "iam:GetRolePolicy",
       "iam:ListRolePolicies",
       "iam:ListAttachedRolePolicies",
@@ -234,4 +226,56 @@ resource "aws_iam_role_policy" "github_pr_read" {
   name   = "github-pr-read"
   role   = aws_iam_role.github_pr.id
   policy = data.aws_iam_policy_document.github_pr_read.json
+}
+
+# ---------------------------------------------------------------------------
+# Deploy (upload lambda zips to S3)
+# ---------------------------------------------------------------------------
+
+data "aws_iam_policy_document" "github_deploy_assume_role" {
+  statement {
+    effect  = "Allow"
+    actions = ["sts:AssumeRoleWithWebIdentity"]
+
+    principals {
+      type        = "Federated"
+      identifiers = [data.aws_iam_openid_connect_provider.github.arn]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:aud"
+      values   = ["sts.amazonaws.com"]
+    }
+
+    condition {
+      test     = "StringEquals"
+      variable = "token.actions.githubusercontent.com:sub"
+      values   = ["repo:${var.github_deploy_repo}:ref:refs/heads/main"]
+    }
+  }
+}
+
+data "aws_iam_policy_document" "github_deploy_upload" {
+  statement {
+    sid    = "S3LambdaZipsUpload"
+    effect = "Allow"
+    actions = [
+      "s3:PutObject",
+    ]
+    resources = [
+      "${aws_s3_bucket.lambda_zips.arn}/*",
+    ]
+  }
+}
+
+resource "aws_iam_role" "github_deploy" {
+  name               = "github-deploy-role"
+  assume_role_policy = data.aws_iam_policy_document.github_deploy_assume_role.json
+}
+
+resource "aws_iam_role_policy" "github_deploy_upload" {
+  name   = "github-deploy-upload"
+  role   = aws_iam_role.github_deploy.id
+  policy = data.aws_iam_policy_document.github_deploy_upload.json
 }
